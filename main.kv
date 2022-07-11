@@ -1,0 +1,706 @@
+#: import NavigationLayout kivymd.uix.navigationdrawer.NavigationLayout
+#: import MDSeparator kivymd.uix.card.MDSeparator
+#: import Screen kivy.uix.screenmanager.Screen
+
+
+<RadioCheck@MDCheckbox>:
+    group: 'clothing_type_inputs'
+    size_hint: 0.3, None
+    
+    size: dp(48), dp(48)
+
+<MyClothesTile@SmartTileWithLabel>:
+    box_color : [0,0,0,0]
+    text:""
+    keep_ratio : True
+    on_press: root.tile_selected()
+
+<DeleteItemTile>:
+    box_color : [0,0,0,0]
+    text:""
+    keep_ratio : True
+    on_press: root.tile_selected()
+
+
+
+<Separator>:
+    id: separator
+    size_hint_y: None
+    height: 10
+    thickness: 5
+    canvas:
+        Color:
+            rgba: app.theme_cls.primary_light
+        Rectangle:
+            pos: self.x, separator.center_y
+            size: separator.width, self.thickness
+
+<DeleteOutfitButton>:
+    icon:"delete"
+    on_press: root.delete_outfit("savedOutfits.csv")
+
+
+<ImageViewer@BoxLayout>:
+    BoxLayout:
+        
+        orientation:"vertical"
+        spacing: 20
+        MDLabel:
+            id: viewer_label
+            theme_text_color: "Custom"
+            text_color: 0.66, 0.4,0.2,1
+            text: ""
+            
+        ScrollView:
+            scroll_type:['bars','content']
+            do_scroll_y: False
+            size_hint_y:None
+            always_overscroll:True
+            bar_width:10
+
+            MDGridLayout:
+                id: container_x
+                size_hint:None,1
+                width:self.minimum_width
+                rows: 1
+                spacing: [10,10]
+                col_default_width: 100
+
+<OutfitGrid@GridLayout>:
+    rows:3
+    cols:3         
+
+    padding:20,20
+    spacing:10
+    size_hint_y:None
+    height: self.row_default_height*self.rows + 50
+    
+    force_default:True
+    row_default_height:100
+    col_default_width:100
+    #adaptive_size: True
+    #md_bg_color: app.theme_cls.primary_light
+    pos_hint:{"center_x":0.5}               
+                
+                 
+<AddNewItemScreen>:
+    #ids
+    upload_preview:upload_preview
+
+    top_check:top_check
+    bottom_check:bottom_check
+    onepiece_check:onepiece_check
+    shoes_check:shoes_check
+    jackets_check:jackets_check
+    accessories_check:accessories_check
+
+
+
+    #This is the 'add new item' screen
+    #always_overscroll: True 
+
+    ScrollView:
+        scroll_type:['bars','content']
+        do_scroll_y: True
+
+        BoxLayout:
+
+            orientation:'vertical' 
+            spacing: 20
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDToolbar:
+                elevation: 10
+                title:"Add New Item"
+                left_action_items: [['keyboard-backspace', lambda x: root.parent.parent.backButton("wardrobe")]]
+                
+            Image:
+                id: upload_preview
+                source: "C:\\Users\\Tisya\\Documents\\A-Level\\A-Level\\Computer Science\\NEA\\Pocket Stylist App\\Images\\image placeholder.png" if root.image_path=="" else root.image_path
+                size_hint:(None,None)
+                keep_ratio: True
+
+                width:800
+            
+                pos_hint:{"center_x":0.5}
+            
+            MDFillRoundFlatIconButton:
+                text:"Upload Image"
+                icon:'image-area'
+                pos_hint:{"center_x":0.5}
+
+                on_press:
+                    root.parent.parent.nextScreen('files')
+
+
+
+            GridLayout: 
+            
+                cols:2
+                rows:6
+
+                size_hint_y:None
+                height: self.minimum_height
+
+                TwoLineListItem:
+                    text:"Top"
+                    secondary_text:"(t-shirt/button-up/blouse etc.)"
+
+                RadioCheck:
+                    id:top_check
+                    on_press: root.radio_selected(self,self.active, "top")
+
+                TwoLineListItem:
+                    text:"Bottom"
+                    secondary_text:"(trousers/shorts/flares etc.)"
+
+                RadioCheck:
+                    id:bottom_check
+                    on_press: root.radio_selected(self,self.active, "bottom")
+
+                TwoLineListItem:
+                    text:"One-Piece"
+                    secondary_text:"(dress/jumpsuit/dungarees etc.)"
+
+                RadioCheck:
+                    id:onepiece_check
+                    on_press: root.radio_selected(self,self.active, "onepiece")
+
+                TwoLineListItem:
+                    text:"Shoes"
+                    secondary_text:"(trainers/heels/wellies etc.)"
+
+                RadioCheck:
+                    id:shoes_check
+                    on_press: root.radio_selected(self,self.active, "shoes")
+
+                TwoLineListItem:
+                    text:"Jackets"
+                    secondary_text:"(shrugs/blazer/coat etc.)"
+
+                RadioCheck:
+                    id:jackets_check
+                    on_press: root.radio_selected(self,self.active, "jackets")
+
+                TwoLineListItem:
+                    text:"Accessories"
+                    secondary_text:"(hat/belt/shawl/jewellery etc.)"
+
+                RadioCheck:
+                    id: accessories_check
+                    on_press: root.radio_selected(self,self.active, "accessories")
+
+
+            MDFillRoundFlatIconButton:
+                text:"ADD ITEM"
+                icon:'upload'   
+                pos_hint:{"center_x":0.5}
+
+                size_hint_x:0.9
+
+                on_press: 
+                    root.add_and_save_item()
+                    
+
+            Widget:
+
+<DeleteItemScreen>:
+    ScrollView:
+        scroll_type:['bars','content']
+        do_scroll_y: True
+
+        BoxLayout:
+
+            orientation:'vertical' 
+            spacing: 20
+            
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDToolbar:
+                elevation: 10
+                title:"Delete Item"
+                left_action_items: [['keyboard-backspace', lambda x: root.parent.parent.backButton("wardrobe")]]
+
+            
+            MDLabel:
+                #pos_hint:{"left":0.6}
+                text:"Select an item to delete:"
+                halign:"center"
+
+            MDGridLayout:
+                id: clothingImagesGrid
+
+                spacing:10
+
+                size_hint_y: None
+                height: self.minimum_height
+
+                cols:3
+                row_default_height: 100
+
+
+<StartScreen>:
+
+    canvas.before:
+        Color:
+            rgba: app.theme_cls.primary_light
+        Rectangle:
+            pos:self.pos
+            size:self.size
+    FloatLayout:
+        
+        MDLabel:
+            pos_hint: {"center_x":0.5, "center_y":0.7}
+            text: "Welcome!"
+            font_style: "H2"
+            halign: "center"
+
+        MDLabel:
+            pos_hint: {"center_x":0.5, "center_y":0.5}
+            text: "Get started with your Pocket Stylist"
+            halign: "center"
+
+        MDIconButton:
+            pos_hint: {"center_x":0.5, "center_y":0.3}
+            icon: "chevron-triple-right"
+            md_bg_color: app.theme_cls.primary_color
+            
+            
+            on_press:
+                self.md_bg_color = app.theme_cls.primary_light
+                
+
+            on_release:
+                self.md_bg_color = app.theme_cls.primary_color
+                root.parent.parent.nextScreen("wardrobe")
+               
+<GenerateOutfitScreen>:
+    outfit_grid:outfit_grid
+    #rating_label:rating_label
+    #ScrollView:
+    #    do_scroll_y:True
+    BoxLayout:
+        orientation:"vertical"
+        size_hint:1,1
+        spacing:10
+        MDToolbar:
+            elevation: 10
+            title:"Try this outfit!"
+            left_action_items: [['keyboard-backspace', lambda x: root.parent.parent.backButton("wardrobe")]]
+
+        
+                    
+        OutfitGrid:
+            id:outfit_grid
+
+        BoxLayout:
+            rating_stars:rating_stars
+            orientation:'vertical'
+            padding:30,10
+            spacing:10
+
+            BoxLayout:   
+                MDLabel:
+                    size_hint_x:None
+                    width:150
+                    text:"Rate this Outfit:"
+
+                MDFillRoundFlatButton:
+                    
+                    text:"RATE"
+                    id:rateButton
+                    on_press:root.rate_button_pressed()
+
+                
+            
+            MDBoxLayout:
+                
+                #md_bg_color:app.theme_cls.primary_color
+                size_hint_x:None
+                #padding:
+                
+
+                BoxLayout:
+                    id:rating_stars
+                    spacing:0
+                    size_hint_x:None
+                    width:230
+                    MDIconButton:
+                        icon:"star-outline"
+                        on_press:root.stars(1)
+                    MDIconButton:
+                        icon:"star-outline"
+                        on_press:root.stars(2)
+                    MDIconButton:
+                        icon:"star-outline"
+                        on_press:root.stars(3)
+                    MDIconButton:
+                        icon:"star-outline"
+                        on_press:root.stars(4)
+                    MDIconButton:
+                        icon:"star-outline"
+                        on_press:root.stars(5)
+
+                
+                
+            
+                
+            
+
+            BoxLayout:
+                id:outfitButtons
+                saveButton:saveButton
+                nextButton:nextButton
+                padding: (self.width - (self.saveButton.width*2))/3,0
+                spacing: (self.width - (self.saveButton.width*2))/3
+
+
+                MDFillRoundFlatIconButton:
+                    id:saveButton
+                    text:"SAVE"
+                    icon:"content-save"
+                    md_bg_color:app.theme_cls.primary_light
+                    disabled:True
+                    on_press: 
+                        root.save_button_pressed(r"C:\Users\Tisya\Documents\A-Level\A-Level\Computer Science\NEA\Pocket Stylist App\savedOutfits.csv")
+                        
+
+                MDFillRoundFlatIconButton:
+                    id:nextButton
+                    text:"NEXT"
+                    icon:"chevron-right" 
+                    disabled:True 
+                    on_press: root.next_button_pressed()           
+
+                
+                
+
+
+                
+                
+                
+
+
+<MyWardrobeScreen>:
+    #This is the 'My Wardrobe' screen.
+
+
+    #ids
+    
+    image_viewers:image_viewers
+    outfitContainer:outfitContainer
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDToolbar:
+            id:wardrobeToolbar
+            title: "My Wardrobe"
+            elevation: 10
+            left_action_items: [['menu', lambda x: root.parent.parent.nav_drawer.set_state("open")]]
+            #right_action_items:[['information-outline', lambda x:root.tooltip()]]
+
+        MDBottomNavigation:
+            #Tabs at bottom
+            panel_color: [0.5,0.5,0.5,1]
+            do_default_tab: False
+            tab_width: self.parent.width / 3
+
+            MDBottomNavigationItem:
+            
+                name: 'clothes'
+                text: 'My Clothes'
+                icon: 'tshirt-crew'
+
+                BoxLayout:
+                    orientation: "vertical"
+
+                    FloatLayout:
+                        padding:10
+                        size_hint_y:None
+                        height:self.children[0].height + 20
+
+
+                        MDIconButton:
+                            icon:"plus"
+                            pos_hint:{"center_x":0.9, "center_y":0.5}
+                            on_release: root.parent.parent.nextScreen("addNewItemScreen")
+
+                        MDIconButton:
+                            icon:"delete"
+                            pos_hint:{"center_x":0.7, "center_y":0.5}
+                            on_release: root.parent.parent.nextScreen("deleteItemScreen")          
+
+
+                    
+                    ScrollView:
+                        do_scroll_x: False
+                        scroll_type:['bars','content']
+                        bar_width:10
+                        
+                        BoxLayout:
+
+                            id:image_viewers
+
+                            tops_viewer:tops_viewer
+                            bottoms_viewer:bottoms_viewer
+                            onepieces_viewer:onepieces_viewer
+                            jackets_viewer:jackets_viewer
+                            shoes_viewer:shoes_viewer
+                            accessories_viewer:accessories_viewer
+
+                            orientation:"vertical"
+                            size_hint_y:None
+                            height: 300*len(self.children)/2
+
+                            padding: [20,10,40,10]
+                            spacing:20
+
+                            ImageViewer:
+                                id: tops_viewer
+
+                            ImageViewer:
+                                id: bottoms_viewer
+
+                            ImageViewer:
+                                id: onepieces_viewer
+
+                            ImageViewer:
+                                id: jackets_viewer
+
+                            ImageViewer:
+                                id: shoes_viewer
+
+                            ImageViewer:
+                                id: accessories_viewer
+
+
+                
+
+            MDBottomNavigationItem:
+                name: 'outfits'
+                text: 'My Outfits'
+                icon: 'hanger'
+
+                MDBoxLayout:
+
+                    ScrollView:
+                        do_scroll_x:False
+                        scroll_type:['bars','content']
+                        size_hint_y:0.9
+                        BoxLayout:
+                            id: outfitContainer
+                            orientation:"vertical"
+                            size_hint_y:None
+                            height:self.minimum_height
+
+
+<OutfitSandboxScreen>:
+    #This is the 'Outfit Sandbox' screen
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDToolbar:
+            title: "Outfit Sandbox"
+            elevation: 10
+            left_action_items: [['menu', lambda x: root.parent.parent.nav_drawer.set_state("open")]]
+
+        MDLabel:
+            text: "Coming Soon: Drag and drop items from your wardrobe to create your own outfit!"
+            halign:"center"
+
+<MyPlannerScreen>:
+    #This is the 'My Planner' screen
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDToolbar:
+            title: "My Planner"
+            elevation: 10
+            left_action_items: [['menu', lambda x: root.parent.parent.nav_drawer.set_state("open")]]
+
+        MDLabel:
+            text:"Coming Soon: Schedule outfits to plan ahead!"
+            halign:"center"
+
+<FileChooserScreen>:
+    #File Manager Screen
+
+    BoxLayout:
+        orientation: "vertical"
+        MDToolbar:
+            elevation: 10
+            title:"Select Image"
+            left_action_items: [['keyboard-backspace', lambda x: root.parent.parent.backButton("addNewItemScreen")]]
+
+        FileChooserIconView:
+            canvas.before:
+                Color:
+                    rgb: .1,.1,.1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            on_submit: 
+                root.selectfile(*args)
+                root.parent.parent.addNewItemScreen.set_image_path(*args)
+                root.parent.parent.backButton('addNewItemScreen')
+            filters: ['*.png', '*.jpg', '*.jpeg']
+            path: r"C:\Users\Tisya"
+
+<MyLayout>:
+    id: mylayout
+    nav_drawer:nav_drawer
+    screenmanager:screenmanager
+
+    wardrobe:wardrobe
+    outfitSandbox:outfitSandbox
+    planner:planner
+    addNewItemScreen:addNewItemScreen
+    deleteItemScreen:deleteItemScreen
+    files:files
+    generateOutfitScreen:generateOutfitScreen
+
+
+    #This section handles the layout of the 3 screens of my project
+
+    ScreenManager:
+
+        #The 3 screens of my project
+
+        id:screenmanager
+
+        
+        StartScreen:
+            id:startScreen
+            name:"startScreen"
+
+        MyWardrobeScreen:
+            id:wardrobe
+            name:"wardrobe"
+
+            on_enter: 
+                root.wardrobe.add_images()
+                root.wardrobe.display_outfits()
+        
+  
+        OutfitSandboxScreen:
+            id:outfitSandbox
+            name:"outfitSandbox"
+            
+        
+        MyPlannerScreen:
+            id:planner
+            name:"planner"
+            
+
+        AddNewItemScreen:
+            id:addNewItemScreen
+            name: "addNewItemScreen"
+        
+        DeleteItemScreen:
+            id:deleteItemScreen
+            name: "deleteItemScreen"
+
+            on_enter: root.deleteItemScreen.add_images()
+
+
+
+        
+        GenerateOutfitScreen:
+            id:generateOutfitScreen
+            name:"generateOutfitScreen"
+
+            on_enter: 
+                root.generateOutfitScreen.refresh()
+                
+
+           
+        FileChooserScreen:
+            id:files
+            name: 'files'
+
+    MDNavigationDrawer:
+        #This section handles the navigation between the screens of my project   
+        
+        id: nav_drawer
+        
+
+        BoxLayout:
+            orientation:"vertical"
+
+            #Toolbar to show 'MENU' title for clarity
+            #also, another menu icon to toggle close
+            MDToolbar:
+                title: "MENU"
+                elevation: 10
+                left_action_items: [['menu', lambda x: nav_drawer.set_state("close")]]
+
+            BoxLayout:
+                orientation:"vertical"
+                
+                canvas.before:
+                    Color:
+                        rgba: app.theme_cls.primary_light
+                    Rectangle:
+                        pos:self.pos
+                        size:self.size
+
+                MDList:
+                    padding:[0,30]
+                    spacing:30
+
+
+                    #Button navigates to 'My Wardrobe' Screen
+                    OneLineIconListItem:
+                        text:"My Wardrobe"
+                        bg_color: app.theme_cls.primary_light
+
+                        on_press:
+                            self.bg_color = app.theme_cls.primary_color
+
+                        on_release:
+                            self.bg_color = app.theme_cls.primary_light
+                            screenmanager.current = "wardrobe"
+                            root.nav_drawer.set_state("close")
+                        
+                        
+                        IconLeftWidget:
+                            icon:"wardrobe-outline"
+            
+                    #Button navigates to 'My Wardrobe' Screen
+                    OneLineIconListItem:
+                        text:"Outfit Sandbox"
+                        bg_color: app.theme_cls.primary_light
+
+                        on_press:
+                            self.bg_color = app.theme_cls.primary_color
+
+                        on_release:
+                            self.bg_color = app.theme_cls.primary_light
+                            screenmanager.current = "outfitSandbox"
+                            root.nav_drawer.set_state("close")
+
+                        IconLeftWidget:
+                            icon:"lead-pencil"
+
+                    #Button navigates to 'My Wardrobe' Screen
+                    OneLineIconListItem:
+                        text:"My Planner"
+                        bg_color: app.theme_cls.primary_light
+
+                        on_press:
+                            self.bg_color = app.theme_cls.primary_color
+
+                        on_release:
+                            self.bg_color = app.theme_cls.primary_light
+                            screenmanager.current = "planner"
+                            root.nav_drawer.set_state("close")
+
+                        IconLeftWidget:
+                            icon:"notebook"
+                Widget:
+                
